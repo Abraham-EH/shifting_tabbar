@@ -89,7 +89,7 @@ class ShiftingTabBar extends StatefulWidget implements PreferredSizeWidget {
   _ShiftingTabBarState createState() => _ShiftingTabBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(0);
 }
 
 class _ShiftingTabBarState extends State<ShiftingTabBar> {
@@ -112,11 +112,8 @@ class _ShiftingTabBarState extends State<ShiftingTabBar> {
   Widget build(BuildContext context) {
     return Container(
       color: _color,
-      child: SafeArea(
-        top: true,
-        child: Row(
-          children: _buildTabWidgets(),
-        ),
+      child: Row(
+        children: _buildTabWidgets(),
       ),
     );
   }
@@ -139,10 +136,7 @@ class _ShiftingTabBarState extends State<ShiftingTabBar> {
           icon: tab.icon,
           onTap: () => _controller!.animateTo(index),
           text: widget.forceUpperCase ? tab.text!.toUpperCase() : tab.text,
-          brightness: _brightness ??
-              (_color!.computeLuminance() > 0.5
-                  ? Brightness.dark
-                  : Brightness.light),
+          brightness: _brightness ?? (_color!.computeLuminance() > 0.5 ? Brightness.dark : Brightness.light),
           labelFlex: widget.labelFlex ?? 1.0,
           labelStyle: widget.labelStyle,
         ),
@@ -156,13 +150,8 @@ class _ShiftingTabBarState extends State<ShiftingTabBar> {
         margin: margin,
         icon: widget.tabs[i].icon,
         onTap: () => _controller!.animateTo(i),
-        text: widget.forceUpperCase
-            ? widget.tabs[i].text!.toUpperCase()
-            : widget.tabs[i].text,
-        brightness: _brightness ??
-            (_color!.computeLuminance() > 0.5
-                ? Brightness.dark
-                : Brightness.light),
+        text: widget.forceUpperCase ? widget.tabs[i].text!.toUpperCase() : widget.tabs[i].text,
+        brightness: _brightness ?? (_color!.computeLuminance() > 0.5 ? Brightness.dark : Brightness.light),
         labelFlex: widget.labelFlex ?? 1.0,
         labelStyle: widget.labelStyle,
       );
@@ -211,11 +200,8 @@ class _ShiftingTabWidget extends AnimatedWidget {
   @override
   Widget build(BuildContext context) {
     final Animation<double> animation = listenable as Animation<double>;
-    final Tween<double> tween =
-        Tween<double>(begin: 1.0, end: 1.0 + labelFlex!);
-    final Color? color = brightness == Brightness.dark
-        ? Color.lerp(Colors.white54, Colors.white, animation.value)
-        : Color.lerp(Colors.black54, Colors.black, animation.value);
+    final Tween<double> tween = Tween<double>(begin: 1.0, end: 1.0 + labelFlex!);
+    final Color? color = brightness == Brightness.dark ? Color.lerp(Colors.white54, Colors.white, animation.value) : Color.lerp(Colors.black54, Colors.black, animation.value);
 
     return Expanded(
       flex: (tween.animate(animation).value * 1000).round(),
@@ -240,25 +226,14 @@ class _ShiftingTabWidget extends AnimatedWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         _buildIcon(color, margin, dir),
-        _buildText(
-            animation,
-            color,
-            dir,
-            labelStyle ??
-                Theme.of(context).textTheme.headline5!.copyWith(
-                    fontSize: 14,
-                    color: color,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.bold)),
+        _buildText(animation, color, dir, labelStyle ?? Theme.of(context).textTheme.headline5!.copyWith(fontSize: 14, color: color, letterSpacing: 2, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
   Widget _buildIcon(Color? color, double? margin, TextDirection dir) {
     return Container(
-      margin: dir == TextDirection.ltr
-          ? EdgeInsets.only(left: margin!)
-          : EdgeInsets.only(right: margin!),
+      margin: dir == TextDirection.ltr ? EdgeInsets.only(left: margin!) : EdgeInsets.only(right: margin!),
       child: IconTheme.merge(
         data: IconThemeData(
           color: color,
@@ -279,17 +254,13 @@ class _ShiftingTabWidget extends AnimatedWidget {
       opacity: animation,
       child: SizeTransition(
         child: Container(
-          margin: dir == TextDirection.ltr
-              ? const EdgeInsets.only(left: 12)
-              : const EdgeInsets.only(right: 12),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                DefaultTextStyle(
-                  style: labelStyle,
-                  child: Text(text!),
-                )
-              ]),
+          margin: dir == TextDirection.ltr ? const EdgeInsets.only(left: 12) : const EdgeInsets.only(right: 12),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            DefaultTextStyle(
+              style: labelStyle,
+              child: Text(text!),
+            )
+          ]),
         ),
         axis: Axis.horizontal,
         axisAlignment: -1.0,
@@ -299,8 +270,7 @@ class _ShiftingTabWidget extends AnimatedWidget {
   }
 }
 
-class _ShiftingAnimation extends Animation<double>
-    with AnimationWithParentMixin<double> {
+class _ShiftingAnimation extends Animation<double> with AnimationWithParentMixin<double> {
   _ShiftingAnimation(this.controller, this.index);
 
   final TabController? controller;
@@ -342,14 +312,10 @@ double _indexChangeProgress(TabController controller, int index) {
     if (index == currentIndex)
       return 1.0 - controller.offset.abs().clamp(0.0, 1.0);
     else
-      return (controller.index + 1 == previousIndex && controller.offset > 0) ||
-              (controller.index - 1 == previousIndex && controller.offset < 0)
-          ? controller.offset.abs().clamp(0.0, 1.0)
-          : 0.0;
+      return (controller.index + 1 == previousIndex && controller.offset > 0) || (controller.index - 1 == previousIndex && controller.offset < 0) ? controller.offset.abs().clamp(0.0, 1.0) : 0.0;
   }
 
   // The TabController animation's value is changing from previousIndex to currentIndex.
-  final double val = (controllerValue - currentIndex).abs() /
-      (currentIndex - previousIndex).abs();
+  final double val = (controllerValue - currentIndex).abs() / (currentIndex - previousIndex).abs();
   return index == currentIndex ? 1.0 - val : val;
 }
